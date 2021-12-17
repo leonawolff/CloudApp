@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+        
+    <head> <h1>Cloud App</h1> </head>
+        <body>
+            <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+            <div id="app">
+                <button v-on:click="create">Create Database</button>
+                <br></br>
+                <strong>Movie Name</strong>
+                <input v-model="movieName">
+                <strong>Release Year</strong>
+                <input v-model="year">
+                <strong>Movie Rating</strong>
+                <input v-model="rating">
+                <button v-on:click="queryDB">Query Database</button>
+                <br></br>
+                <button v-on:click="destroy">Destroy Database</button>
+                <div>
+                    <table id="movieTable" style="width:20%">
+                        <tr>
+                            <th>Movie</th>
+                            <th>Year</th>
+                            <th>Rating</th>
+                            <th>Rank</th>
+                        </tr>
+                        <tr v-for='(movie, index) in movieData'>
+                            <td>{{ movieData[index].title }}</td>
+                            <td>{{ movieData[index].year }}</td>
+                            <td>{{ (movieData[index].rating == -1) ? '' : movieData[index].rating }}</td>
+                            <td>{{ movieData[index].rank }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </body>
+
+    <script>
+        var app = new Vue({
+                    el: "#app",
+                    data: {
+                        movieName: "",
+                        year: null,
+                        rating: null,
+                        movieData : []
+                    },
+                    methods: {
+                        create(){
+                            fetch(`/create`)
+                            .then(response=>response.json())
+                            .then(data=>{
+                                alert(data.result.message);
+                            })
+                        },
+                        queryDB(){
+                            fetch('/queryDB/' + this.movieName + '/' + this.year + '/' + this.rating)
+                            .then(response=>response.json()).then(response=>{
+                                this.movieData = response.result;
+                                console.log(this.movieData)
+                                console.log(this.movieData[0].title)
+                            })
+                        },
+                        destroy(){
+                            fetch(`/destroy`)
+                            .then(res=>res.json())
+                            .then(data=>{
+                                alert(data.result.message);
+                            })
+                        }
+                    }
+                });
+    </script>
+</html>
